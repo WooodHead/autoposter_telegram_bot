@@ -1,0 +1,24 @@
+{
+  "sessions": [
+    {
+      "id": "2112769186:2112769186",
+      "data": {
+        "user": {
+          "user_status": {
+            "id": 3,
+            "name": "admin"
+          },
+          "status_id": 3,
+          "first_name": "Александр",
+          "last_name": null,
+          "username": "ivanchinalex",
+          "id": 2112769186,
+          "chat_id": 2112769186,
+          "balance": 71800,
+          "email": null
+        },
+        "__scenes": {}
+      }
+    }
+  ]
+}

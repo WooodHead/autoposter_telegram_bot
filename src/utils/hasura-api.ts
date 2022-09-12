@@ -1,26 +1,28 @@
-import * as dotenv from 'dotenv';
-dotenv.config();
+import * as dotenv from 'dotenv'
+dotenv.config()
 // eslint-disable-next-line no-new-func
-const importDynamic = new Function('modulePath', 'return import(modulePath)');
+const importDynamic = new Function('modulePath', 'return import(modulePath)')
 
 const fetch = async (...args: any[]) => {
-    const module = await importDynamic('node-fetch');
-    return module.default(...args);
-};
+    const module = await importDynamic('node-fetch')
+    return module.default(...args)
+}
 
 interface HasuraFetchPropsType {
     query: string,
     variables?: Record<string, any>
 }
 
-type HasuraResponse<T> = {
+type HasuraRes<T> = {
     data: T
     errors?: Array<any>
 }
-// type hasuraResponce = {}
+/**
+ * HASURA GraphQL gateway
+ */
 export default class HasuraAPI {
 
-    static async send<T>({ query, variables }: HasuraFetchPropsType) {
+    static async send<T> ({ query, variables }: HasuraFetchPropsType): Promise<T> {
         try {
             const response = await fetch(process.env.HASURA_ENDPOINT || '/', {
                 method: 'POST',
@@ -34,15 +36,20 @@ export default class HasuraAPI {
                 }),
             })
 
-            const data = await response.json() as HasuraResponse<T>;
+            const data = await response.json() as HasuraRes<T>
 
             if (data?.errors) {
-                throw Error(JSON.stringify(data?.errors));
+                throw Error(JSON.stringify(data?.errors))
             }
+
+            if (!data.data)
+                throw Error('Expecting "data" or "errors" properties in responce were not provided.')
 
             return data.data
         } catch (e) {
             console.error(e)
+            throw e
         }
     }
 }
+

@@ -2,25 +2,20 @@
   "name": "autoposter_telegram_bot",
   "version": "1.0.0",
   "description": "",
-  "main": "src/bot.ts",
+  "main": "src/index.ts",
   "scripts": {
-    "start": "npm run serve",
+    "dev": "rm -f example_db.json && ts-node src/index.ts",
     "build": "npm run build-ts",
-    "serve": "NODE_ENV=production node dist/bot.js",
-    "watch-node": "nodemon dist/bot.js",
-    "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\"  \"npm run watch-ts\" \"npm run watch-node\"",
-    "build-ts": "tsc",
     "watch-ts": "tsc -w",
-    "tslint": "tslint -c tslint.json -p tsconfig.json",
-    "debug": "npm run build && npm run watch-debug",
-    "serve-debug": "nodemon --inspect dist/bot.js",
-    "watch-debug": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run serve-debug\""
+    "tslint": "tslint -c tslint.json -p tsconfig.json"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^18.7.14",
+    "@types/node-fetch": "^2.6.2",
+    "@types/node-schedule": "^2.1.0",
     "concurrently": "^7.3.0",
     "nodemon": "^2.0.19",
     "prettier": "^2.7.1",
@@ -29,8 +24,16 @@
     "typescript": "^4.8.2"
   },
   "dependencies": {
+    "class-transformer": "^0.5.1",
+    "crypto": "^1.0.1",
     "dotenv": "^16.0.1",
-    "node-fetch": "^3.2.10",
-    "telegraf": "^4.9.1"
+    "install": "^0.13.0",
+    "moment": "^2.29.4",
+    "node-fetch": "^2.6.7",
+    "node-schedule": "^2.1.0",
+    "npm": "^8.19.1",
+    "reflect-metadata": "^0.1.13",
+    "telegraf": "^4.9.1",
+    "telegraf-session-local": "^2.1.0"
   }
 }

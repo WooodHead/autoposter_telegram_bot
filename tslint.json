@@ -1,5 +1,7 @@
 {
     "rules": {
+        "semicolon": false,
+        "trailing-comma": false,
         "class-name": true,
         "comment-format": [
             true,
@@ -19,11 +21,6 @@
             true,
             "single",
             "avoid-escape"
-        ],
-        "semicolon": [
-            false,
-            "always",
-            "ignore-bound-class-methods"
         ],
         "whitespace": [
             true,

@@ -1,7 +1,8 @@
-import { Markup } from "telegraf";
-import { AdsChat } from "../../types/ads-chat";
+import { Markup } from "telegraf"
+import Chat from '../../chat'
 
-export const selectAdsChatKeyboard = (chats: Array<AdsChat>) => {
+
+export const selectChatKeyboard = (chats: Array<Chat>) => {
 
     const buttons = chats.map((each => {
         return [Markup.button.callback(each.name, each.name)]
