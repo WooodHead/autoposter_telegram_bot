@@ -1,4 +1,4 @@
-interface IChatConstructor {
+export interface IChatConstructor {
     id: number
     name: string
     target_audience: string

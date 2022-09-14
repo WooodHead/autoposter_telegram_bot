@@ -1,0 +1,43 @@
+query GetPaymentByPK($id: Int!) {
+  auto_poster_bot_payment_by_pk(id: $id) {
+    amount
+    date
+    id
+    post_id
+    status
+    client_id
+  }
+}
+
+query GetObservablePayments($_gte: timestamptz!) {
+  auto_poster_bot_payment(where: {date: {_gte: $_gte}, status: {_eq: 0}}) {
+    amount
+    client_id
+    date
+    id
+    post_id
+    status
+  }
+}
+
+mutation InsertNewPayment($amount: numeric!, $post_id: Int, $client_id: Int!) {
+  insert_auto_poster_bot_payment_one(object: {
+    status: 0,
+    post_id: $post_id,
+    amount: $amount,
+    client_id: $client_id
+    }) {
+    amount
+    date
+    id
+    post_id
+    status
+  }
+}
+
+mutation UpdateStatus($status: Int!, $id: Int!) {
+  update_auto_poster_bot_payment_by_pk(pk_columns: {id: $id}, _set: {status: $status}) {
+    id
+  }
+}
+

@@ -1,7 +1,7 @@
 {
   "sessions": [
     {
-      "id": "2112769186:2112769186",
+      "id": "441494356:441494356",
       "data": {
         "user": {
           "user_status": {
@@ -9,13 +9,13 @@
             "name": "admin"
           },
           "status_id": 3,
-          "first_name": "Александр",
-          "last_name": null,
-          "username": "ivanchinalex",
-          "id": 2112769186,
-          "chat_id": 2112769186,
-          "balance": 71800,
-          "email": null
+          "first_name": "Иван",
+          "last_name": "Лосеев",
+          "username": "fallasleepalllater",
+          "id": 441494356,
+          "chat_id": 441494356,
+          "balance": 495,
+          "email": "loseev5@gmail.com"
         },
         "__scenes": {}
       }

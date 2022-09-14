@@ -1,9 +1,8 @@
-import { bot, paymentNotifier } from "."
+import { bot } from "."
 
 import Chat from "./chat"
-import PostService from "./services/post-service"
-import PaymentService from "./services/payment-service"
-import UserService from "./services/user-service"
+import PostService from "./services/post.service/post-service"
+import UserService from "./services/user.service/user-service"
 
 import schedule from 'node-schedule'
 import { plainToInstance, Type } from 'class-transformer'
@@ -11,16 +10,13 @@ import Admin from './admin'
 import moment from 'moment'
 
 
-type PaymentFullStatus = 'new' | 'paid' | 'revoked' | 'error'
-export type PaymentStatuses = 0 | 1 | 9 | 8
-
-
 type IPostObject = {
     advertising_chat_id: number
     advertising_days: number
     client_id: number
     id: number
-    payment_status: PaymentFullStatus
+    // payment_status: PaymentFullStatus
+    payment_id: number
     keyboard: string
     passed_moderation: boolean
     photo: string
@@ -39,19 +35,18 @@ type IPostObject = {
 
 export default class Post {
     id?: number
-    payment_status?: PaymentFullStatus
+    payment_id?: number
     price: number
     publication_start_date?: moment.Moment
     publication_end_date?: moment.Moment
-    payment_URL?: string
 
     @Type(() => Chat)
     chat: Chat
 
     constructor (
         public text: string,
-        public photo: string,
-        public keyboard: string,
+        public photo: string | undefined | null,
+        public keyboard: string | undefined | null,
         public advertising_days: number,
         public publication_hour: number,
         public client_id: number,
@@ -76,15 +71,13 @@ export default class Post {
         )
 
         post.id = object.id
-        post.payment_status = object.payment_status
         post.publication_start_date = moment(object.publication_start_date!)
         post.publication_end_date = moment(object.publication_end_date!)
         return post
     }
 
     public async insert (): Promise<this> {
-        this.id = await PostService.createAdsPost(this)
-        this.payment_URL = PaymentService.generatePaymentURL(this.price, this.id)
+        this.id = await PostService.createPost(this)
         return this
     }
 
@@ -95,20 +88,15 @@ export default class Post {
         Admin.sendPostOnModeration(this)
     }
 
-    public async registerInPaymentNotificationProcess () {
+    public async paymentСonfirmed () {
         const post = this
-
         if (!post.id) throw Error('Post ID must be implemented')
-        paymentNotifier.register({
-            post_id: post.id!,
-            async cb (payment_number, status) {
-                post.sendMessageToPostOwner(`Поступила оплата по вашему заказу ${post.id}! Мы отправили его на модерацию.`)
-                // INCREMENT USER INTERNAL BALANCE || 
-                // As soon as the payment is performed, we will increase user's balance by 10% 
-                await UserService.incrementUserBalance(post.client_id, post.price * 0.1)
-                await post.sendOnModerationStep()
-            },
-        })
+
+        post.sendMessageToPostOwner(`Поступила оплата по вашему заказу ${post.id}! Мы отправили его на модерацию.`)
+        // INCREMENT USER INTERNAL BALANCE || 
+        // As soon as the payment is performed, we will increase user's balance by 10% 
+        await UserService.incrementUserBalance(post.client_id, post.price * 0.1)
+        await post.sendOnModerationStep()
     }
     /**
     *  send post in certain chat (it may be moderation step or production yet) 
@@ -128,25 +116,6 @@ export default class Post {
         }
     }
 
-    public async setPaymentStatus (newPaymentStatus: PaymentFullStatus) {
-        let status: PaymentStatuses
-        switch (newPaymentStatus) {
-            case 'new':
-                status = 0
-            case 'paid':
-                status = 1
-                break
-            case 'error':
-                status = 8
-                break
-            case 'revoked':
-                status = 9
-                break
-        }
-
-        await PostService.updatePaymentStatus(status, this.id!)
-        this.payment_status = newPaymentStatus
-    }
 
     public registerPublicationEvents (): void {
         if (!this.publication_end_date) throw Error('Unregistered post')
@@ -156,7 +125,7 @@ export default class Post {
         const hour = this.publication_hour
         const ads_chat_id = this.chat.id
 
-        schedule.scheduleJob({ start: now, end: end, hour: hour, minute: 0 }, () => {
+        schedule.scheduleJob({ start: now, end: end, hour: hour, minute: 10 }, () => {
             this.sendPostInChat(ads_chat_id)
         })
     }
@@ -176,7 +145,6 @@ export default class Post {
         catch (e: any) {
             bot.telegram.sendMessage(this.client_id, `Упс. Ошибка. Пожалуйста, напишите в поддержку! \n\n ${JSON.stringify(e.message)}`)
         }
-
     }
 
     // Выполняется когда модератор отклонил пост

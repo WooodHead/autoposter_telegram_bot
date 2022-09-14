@@ -1,0 +1,49 @@
+query GetUserByPK($id: bigint!) {
+  auto_poster_bot_user_by_pk(id: $id) {
+    user_status {
+      id
+      name
+    }
+    status_id
+    first_name
+    last_name
+    username
+    id
+    chat_id
+    balance
+    email
+  }
+}
+
+mutation InsertUser($object: auto_poster_bot_user_insert_input!) {
+  insert_auto_poster_bot_user_one(object: $object) {
+    user_status {
+      id
+      name
+    }
+    status_id
+    first_name
+    last_name
+    username
+    id
+    chat_id
+    balance
+    email
+  }
+}
+
+mutation IncrementUserBalance($id: bigint!, $balance: Int!) {
+  update_auto_poster_bot_user_by_pk(pk_columns: {id: $id}, _inc: {balance: $balance}) {
+    id
+    balance
+  }
+}
+
+
+query GetModerators {
+  auto_poster_bot_user(where: {status_id: {_gt: 1}}) {
+    status_id
+    id
+    chat_id
+  }
+}

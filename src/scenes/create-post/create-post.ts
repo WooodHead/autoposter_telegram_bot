@@ -11,7 +11,8 @@ import { backKeyboard, backKeyboardButton } from "../../utils/keyboards/back-key
 import Chat from "../../chat"
 import Post from "../../post"
 import { getUser } from '../../utils/get-user-id'
-import PaymentService from '../../services/payment-service'
+import { ctxHaveText, getCtxPhoto, getCtxText } from '../../utils/helpers'
+import PaymentController from '../../services/payment.service/payment.controller'
 
 
 const priseListMessage = `
@@ -117,13 +118,13 @@ function registerChatActions (chatList: Chat[]): void {
 
 payStep.hears(payKeyboardButtons[0], async ctx => {
     const post = ctx.scene.session.registered_post
-    await PaymentService.payWithFk(ctx, post)
+    await PaymentController.payWithFk(ctx, post)
     ctx.scene.leave()
 })
 
 payStep.hears(payKeyboardButtons[1], async ctx => {
     const post = ctx.scene.session.registered_post
-    await PaymentService.payWithInternalBalance(ctx, post)
+    await PaymentController.payWithInternalBalance(ctx, post)
     ctx.scene.leave()
 })
 
@@ -132,15 +133,6 @@ payStep.hears(payKeyboardButtons[2], async ctx => {
     ctx.scene.leave()
 })
 
-const ctxHaveText = (ctx: MyContext): boolean => {
-    if (ctx.message) {
-        return ('text' in ctx.message!) ? true : false
-    }
-    else return false
-}
-
-const getCtxText = (ctx: MyContext): string | null => ('text' in ctx.message!) ? ctx.message.text : null
-const getCtxPhoto = (ctx: MyContext): unknown | null => ('photo' in ctx.message!) ? ctx.message.photo : null
 
 
 export const createPostWizard = new Scenes.WizardScene('createPostWizard',
@@ -156,8 +148,7 @@ export const createPostWizard = new Scenes.WizardScene('createPostWizard',
         selectChatStep,
 
         async (ctx: MyContext) => {
-            if (!ctxHaveText(ctx))
-                return
+            if (!ctxHaveText(ctx)) return
             const ctxText = getCtxText(ctx)
 
             if (ctxText === backKeyboardButton) {

@@ -12,25 +12,26 @@ import { createPostWizard } from './scenes/create-post/create-post'
 
 import { MyContext } from './types/wizard-context'
 import homeScene from './scenes/home'
-import PaymentNotifier from './jobs/payment-notifier'
-
+import PaymentObserver from './jobs/payment-observer'
 import { restrictInChat } from './middlewares/restrict-inchat'
-
 import schedule from 'node-schedule'
 import PostPublishing from './jobs/post-publishing'
-import moment from 'moment'
-
-
+import { GraphQLClient } from 'graphql-request'
 
 const token = process.env.BOT_TOKEN
 if (token === undefined) {
     throw new Error('BOT_TOKEN must be provided!')
 }
 
-export const bot = new Telegraf<MyContext>(token)
-export const paymentNotifier = new PaymentNotifier()
-const ppp = new PostPublishing()
+export const client = new GraphQLClient(process.env.HASURA_ENDPOINT!, {
+    headers: {
+        'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET!
+    }
+})
 
+export const bot = new Telegraf<MyContext>(token)
+export const paymentNotifier = new PaymentObserver()
+const ppp = new PostPublishing()
 
 
 const stage = new Scenes.Stage<MyContext>([
@@ -38,11 +39,11 @@ const stage = new Scenes.Stage<MyContext>([
     { default: 'homeScene' }
 )
 
+
 bot.use((new LocalSession({ database: 'example_db.json', })).middleware())
 bot.use(restrictInChat)
 bot.use(authenticate)
 bot.use(stage.middleware())
-
 
 bot.launch()
 
@@ -51,4 +52,5 @@ process.on('SIGINT', function () {
     schedule.gracefulShutdown()
         .then(() => process.exit(0))
 })
+
 

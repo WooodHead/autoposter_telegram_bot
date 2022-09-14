@@ -1,5 +1,5 @@
 
-import PostService from "../services/post-service"
+import PostService from "../services/post.service/post-service"
 import Post from '../post'
 import schedule from 'node-schedule'
 
@@ -11,7 +11,7 @@ export default class PostPublishing {
         this.init()
 
         // check on new posts every minute
-        schedule.scheduleJob('*/1 * * * *', () => {
+        schedule.scheduleJob('*/10 * * * * *', () => {
             this.scheduledPostListUpdate()
         })
     }
@@ -26,7 +26,7 @@ export default class PostPublishing {
         })
 
         this.productionPostList = data
-        console.log('posts now in production:', this.productionPostList.map(each => each.id))
+        console.log('posts now in production:', this.productionPostList.map(each => [each.id, each.publication_hour]))
     }
 
 

@@ -1,9 +1,11 @@
-import { Scenes } from "telegraf"
-import UserService from "../services/user-service"
+import { Markup, Scenes } from "telegraf"
+import UserService from "../services/user.service/user-service"
 import { MyContext } from "../types/wizard-context"
 import { getUserId } from '../utils/get-user-id'
 import { balanceButtons, balanceKeyboard } from "../utils/keyboards/balance-keyboard"
 import { mainKeyboard } from "../utils/keyboards/main-keyboard"
+import PaymentController from '../services/payment.service/payment.controller'
+
 
 const balanceScene = new Scenes.BaseScene<MyContext>('balanceScene')
 
@@ -15,6 +17,15 @@ balanceScene.enter(async ctx => {
 
 balanceScene.hears(balanceButtons[0], (ctx: MyContext) => {
     ctx.reply('Меню', mainKeyboard)
+    ctx.scene.leave()
+})
+
+balanceScene.hears(balanceButtons[1], ctx => {
+    ctx.sendMessage('Введите сумму пополнения')
+})
+
+balanceScene.on('text', async ctx => {
+    PaymentController.topUpInternalBalance(ctx)
     ctx.scene.leave()
 })
 

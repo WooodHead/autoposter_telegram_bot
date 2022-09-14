@@ -1,8 +1,10 @@
 import { Context, Scenes } from "telegraf"
 
-import { AppUser } from "./app-user"
+
 import Post from "../post"
 import Chat from "../chat"
+import { Query_RootAuto_Poster_Bot_User_By_PkArgs } from '../generated/graphql'
+import { AppUser } from './app-user'
 
 
 

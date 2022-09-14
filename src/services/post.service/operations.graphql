@@ -1,0 +1,54 @@
+fragment postData on auto_poster_bot_post {
+  advertising_chat_id
+  advertising_days
+  client_id
+  id
+  payment_status
+  keyboard
+  passed_moderation
+  photo
+  price
+  publication_end_date
+  publication_start_date
+  text
+  publication_hour
+  chat {
+    id
+    name
+    per_day_price
+    target_audience
+  }
+}
+
+
+query GetPostByPk($id: Int!) {
+  auto_poster_bot_post_by_pk(id: $id) {
+    ...postData
+  }
+}
+
+query GetProductionPost($_gte: timestamptz!) {
+ auto_poster_bot_post(where: {payment: {status: {_eq: 1}}, publication_end_date: {_gte: $_gte}}){
+ ...postData
+ }
+}
+
+
+mutation InserPost($object: auto_poster_bot_post_insert_input!) {
+  insert_auto_poster_bot_post_one(object: $object) {
+    id
+  }
+}
+
+mutation takePostIntoProduction($id: Int!, $publication_start_date: timestamptz!, $publication_end_date: timestamptz!) {
+  update_auto_poster_bot_post_by_pk(pk_columns: {id: $id}, _set: {publication_start_date: $publication_start_date, publication_end_date: $publication_end_date, passed_moderation: true}) {
+    id
+  }
+}
+
+mutation addPaymentId($payment_id: Int!, $id: Int!) {
+  update_auto_poster_bot_post_by_pk(pk_columns: {id: $id}, _set: {payment_id: $payment_id}) {
+    id
+    payment_id
+  }
+}
