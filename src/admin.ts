@@ -1,4 +1,3 @@
-import { Markup } from 'telegraf'
 import { bot } from '.'
 import Post from './post'
 import UserService from './services/user.service/user-service'
