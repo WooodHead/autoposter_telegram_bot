@@ -32,7 +32,10 @@ export default class UserService {
     static async registerUser (object: RegisterUserPropsType) {
         const data = (await client.request(InsertUserDocument, { object: object })).insert_auto_poster_bot_user_one
 
-        return { ...data } as AppUser
+        return {
+            is_bot: false,
+            ...data
+        } as AppUser
     }
 
     static async getAdmin () {

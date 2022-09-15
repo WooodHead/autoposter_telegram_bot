@@ -41,7 +41,7 @@ export default class PostService {
 
         const timeNow = moment().toISOString()
         const data = await client.request(GetProductionPostDocument, { _gte: timeNow })
-        console.log(data)
+
         return data.auto_poster_bot_post.map(each => {
             const chat = plainToInstance(Chat, each.chat)
 
