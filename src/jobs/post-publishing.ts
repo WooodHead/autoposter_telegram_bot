@@ -2,6 +2,7 @@
 import PostService from "../services/post.service/post-service"
 import Post from '../post'
 import schedule from 'node-schedule'
+import { EVERY_TEN_SEC_CRON_EPX as EVERY_TEN_SEC_CRON_EXP } from '..'
 
 export default class PostPublishing {
 
@@ -10,8 +11,7 @@ export default class PostPublishing {
     constructor () {
         this.init()
 
-        // check on new posts every minute
-        schedule.scheduleJob('*/10 * * * * *', () => {
+        schedule.scheduleJob(EVERY_TEN_SEC_CRON_EXP, () => {
             this.scheduledPostListUpdate()
         })
     }
@@ -54,9 +54,12 @@ export default class PostPublishing {
 
         // TODO: add ten addition minutes for post will have published in last time.
         const date: Date = post.publication_end_date!.toDate()
+        console.log(`${post.id} elimination ended is sets on ${date}`)
 
         schedule.scheduleJob(date, () => {
-            this.productionPostList.filter(each => each.id !== post.id)
+
+            this.productionPostList = this.productionPostList
+                .filter(each => each.id !== post.id)
         })
     }
 

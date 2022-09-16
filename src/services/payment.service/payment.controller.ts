@@ -7,6 +7,7 @@ import { getCtxText } from '../../utils/helpers'
 import { Markup } from 'telegraf'
 import { getUserId } from '../../utils/get-user-id'
 import PostService from '../post.service/post-service'
+import { EVERY_THIRTY_SEC_CRON_EPX as EVERY_THIRTY_SEC_CRON_EXP } from '../..'
 
 
 const registrationFailMessage = (`
@@ -73,7 +74,7 @@ export default class PaymentController {
             await ctx.reply(`Ссылка на оплату: ${payment_URL}`,)
 
             // Следующее событие выполнится когда PaymentObserver обработает платеж
-            const job = schedule.scheduleJob('*/1 * * * *', async () => {
+            const job = schedule.scheduleJob(EVERY_THIRTY_SEC_CRON_EXP, async () => {
                 const payment = await PaymentService.getPaymentByPK(registered_payment?.id!)
 
                 if (payment?.status === 1) {
@@ -112,7 +113,7 @@ export default class PaymentController {
         )
 
         // post.registerInPaymentNotificationProcess()
-        const job = schedule.scheduleJob('*/10 * * * * *', async () => {
+        const job = schedule.scheduleJob(EVERY_THIRTY_SEC_CRON_EXP, async () => {
             const payment = await PaymentService.getPaymentByPK(registered_payment?.id!)
 
             if (payment?.status === 1) {

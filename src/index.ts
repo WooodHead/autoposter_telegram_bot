@@ -18,6 +18,9 @@ import schedule from 'node-schedule'
 import PostPublishing from './jobs/post-publishing'
 import { GraphQLClient } from 'graphql-request'
 
+export const EVERY_TEN_SEC_CRON_EPX = '*/10 * * * * *'
+export const EVERY_THIRTY_SEC_CRON_EPX = '*/30 * * * * *'
+
 const token = process.env.BOT_TOKEN
 if (token === undefined) {
     throw new Error('BOT_TOKEN must be provided!')

@@ -1,7 +1,7 @@
 import schedule from 'node-schedule'
 import PaymentService from '../services/payment.service/payment.service'
 import { Auto_Poster_Bot_Payment } from '../generated/graphql'
-import { bot } from '..'
+import { bot, EVERY_TEN_SEC_CRON_EPX } from '..'
 
 
 export default class PaymentObserver {
@@ -22,7 +22,7 @@ export default class PaymentObserver {
     }
 
     private async runTaskScheduler () {
-        return schedule.scheduleJob('*/10 * * * * *', async () => {
+        return schedule.scheduleJob(EVERY_TEN_SEC_CRON_EPX, async () => {
             await this.init()
 
             const FKPayments = await PaymentService.getLatestFKPayments(
