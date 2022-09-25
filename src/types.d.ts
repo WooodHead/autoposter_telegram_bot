@@ -1,12 +1,5 @@
-import { Context, Scenes } from "telegraf"
-
-
-import Post from "../post"
-import Chat from "../chat"
-import { Query_RootAuto_Poster_Bot_User_By_PkArgs } from '../generated/graphql'
-import { AppUser } from './app-user'
-
-
+import { Context, Scenes } from 'telegraf'
+import { User } from 'telegraf/typings/core/types/typegram'
 
 /**
  * It is possible to extend the session object that is available to each wizard.
@@ -50,7 +43,7 @@ interface MySession extends Scenes.WizardSession<MyWizardSession> {
  *
  * We also have to set the wizard object under the `wizard` property.
  */
-export interface MyContext extends Context {
+declare interface MyContext extends Context {
     // will be available under `ctx.myContextProp`
     // myContextProp: string
 
@@ -60,4 +53,10 @@ export interface MyContext extends Context {
     scene: Scenes.SceneContextScene<MyContext, MyWizardSession>
     // declare wizard type
     wizard: Scenes.WizardContextWizard<MyContext>
+}
+
+interface AppUser extends User {
+    balance: number
+    chat_id: number
+    status_id: number
 }

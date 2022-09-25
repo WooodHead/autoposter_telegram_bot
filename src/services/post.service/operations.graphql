@@ -33,6 +33,14 @@ query GetProductionPost($_gte: timestamptz!) {
  }
 }
 
+query GetSalesChatList{
+  auto_poster_bot_advertising_chat {
+    id
+    name
+    per_day_price
+    target_audience
+  }
+}
 
 mutation InserPost($object: auto_poster_bot_post_insert_input!) {
   insert_auto_poster_bot_post_one(object: $object) {

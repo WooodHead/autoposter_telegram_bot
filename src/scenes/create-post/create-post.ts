@@ -1,18 +1,16 @@
 import { Composer, Markup, Scenes } from "telegraf"
-import ChatService from "../../services/chat-service"
-
-import { MyContext } from "../../types/wizard-context"
+import Chat from "../../chat"
+import Post from "../../post"
+import PaymentController from '../../services/payment.service/payment.controller'
+import PostService from '../../services/post.service/post-service'
+import { MyContext } from "../../types"
+import { getUser } from '../../utils/get-user-id'
+import { ctxHaveText, getCtxPhoto, getCtxText } from '../../utils/helpers'
+import { backKeyboard, backKeyboardButton } from "../../utils/keyboards/back-keyboard"
+import { mainKeyboard } from "../../utils/keyboards/main-keyboard"
 import { selectChatKeyboard } from "../../utils/keyboards/select-chat-keyboard"
 import { isValidHttpUrl } from "./helpers"
 import { payKeyboard, payKeyboardButtons } from "./keyboars"
-import { mainKeyboard } from "../../utils/keyboards/main-keyboard"
-
-import { backKeyboard, backKeyboardButton } from "../../utils/keyboards/back-keyboard"
-import Chat from "../../chat"
-import Post from "../../post"
-import { getUser } from '../../utils/get-user-id'
-import { ctxHaveText, getCtxPhoto, getCtxText } from '../../utils/helpers'
-import PaymentController from '../../services/payment.service/payment.controller'
 
 
 const priseListMessage = `
@@ -95,6 +93,9 @@ function registerPublicationTimeActions (): void {
 
             ctx.wizard.next()
         })
+        choosePublicationTimeStage.on('text', ctx => {
+            ctx.wizard.back()
+        })
     })
 }
 
@@ -135,10 +136,11 @@ payStep.hears(payKeyboardButtons[2], async ctx => {
 
 
 
+
 export const createPostWizard = new Scenes.WizardScene('createPostWizard',
     ...[
         async (ctx: MyContext) => {
-            const chats = await ChatService.getChats()
+            const chats = await PostService.getSalesChatList()
             ctx.reply(priseListMessage, selectChatKeyboard(chats))
 
             registerChatActions(chats)
@@ -165,7 +167,7 @@ export const createPostWizard = new Scenes.WizardScene('createPostWizard',
 
             ctx.scene.session.advertising_days = advertisingDays
 
-            ctx.reply('Теперь отправльте боту текст поста!')
+            ctx.reply('Теперь отправльте боту текст поста!', Markup.removeKeyboard())
             return ctx.wizard.next()
         },
 
@@ -182,10 +184,14 @@ export const createPostWizard = new Scenes.WizardScene('createPostWizard',
             return ctx.wizard.next()
         },
         async (ctx: MyContext) => {
+            const ctxText = getCtxText(ctx)
             const photo = getCtxPhoto(ctx)
 
             if (photo) {
                 ctx.scene.session.post_photo = JSON.stringify(photo)
+            }
+            if (ctxText && ctxText !== 'Пропустить') {
+                return ctx.reply('Это не картинка!')
             }
 
             let message = "Чтобы добавить URL-кнопку отправьте сообщение в таком формате: 'ТекстКнопки | URL'."
@@ -199,22 +205,30 @@ export const createPostWizard = new Scenes.WizardScene('createPostWizard',
             if (!ctxText)
                 return ctx.reply("Я жду URL-кнопку в формате 'ТекстКнопки | URL'!")
 
-            if (ctxText !== "Пропустить" && ctxText.split('|').length === 2) {
-                const buttonTitle = ctxText.split('|')[0].toString().trim()
-                const buttonUrl = ctxText.split('|')[1].toString().trim()
+            if (ctxText !== "Пропустить") {
+                const buttonTitle = ctxText.split('|')[0]?.toString().trim()
+                const buttonUrl = ctxText.split('|')[1]?.toString().trim()
 
-                if (!isValidHttpUrl(buttonUrl)) {
-                    return ctx.reply('Неправильная ссылка, она должна быть указана с протоколом https://')
+                if (!isValidHttpUrl(buttonUrl) || !buttonTitle) {
+                    return ctx.reply('Неправильная ссылка, она должна быть вормате "ТекстКнопки | https://URL" ')
                 }
 
                 ctx.scene.session.post_keyboard = JSON.stringify([[Markup.button.url(buttonTitle, buttonUrl)]])
             }
 
-            ctx.reply("Выберите время публикации", Markup.inlineKeyboard([
-                Markup.button.callback('12:00', '12'),
-                Markup.button.callback('14:00', '14'),
-                Markup.button.callback('16:00', '16')
-            ]))
+            await ctx.reply('!', Markup.removeKeyboard())
+
+            ctx.reply("Выберите время публикации", {
+                reply_markup: {
+                    inline_keyboard: [[
+                        Markup.button.callback('12:00', '12'),
+                        Markup.button.callback('14:00', '14'),
+                        Markup.button.callback('16:00', '16')
+                    ]],
+                    remove_keyboard: true,
+                    one_time_keyboard: true
+                }
+            })
 
             registerPublicationTimeActions()
 
@@ -224,6 +238,11 @@ export const createPostWizard = new Scenes.WizardScene('createPostWizard',
 
         payStep
     ]
-);
+)
 
+
+createPostWizard.command('start', ctx => {
+    ctx.scene.leave()
+    ctx.reply('🏠', mainKeyboard)
+})
 

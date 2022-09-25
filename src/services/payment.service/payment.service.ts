@@ -4,7 +4,6 @@ import moment from 'moment'
 import AcquiringAPI from '../../utils/acquiring-api'
 import { stringifyQueryParams } from "../../utils/helpers"
 import crypto from 'crypto'
-import PostService from '../post.service/post-service'
 
 type FKTransaction = {
     merchant_order_id: string

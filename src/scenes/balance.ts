@@ -1,15 +1,17 @@
-import { Markup, Scenes } from "telegraf"
-import UserService from "../services/user.service/user-service"
-import { MyContext } from "../types/wizard-context"
-import { getUserId } from '../utils/get-user-id'
-import { balanceButtons, balanceKeyboard } from "../utils/keyboards/balance-keyboard"
-import { mainKeyboard } from "../utils/keyboards/main-keyboard"
+import { Scenes } from 'telegraf'
 import PaymentController from '../services/payment.service/payment.controller'
-
+import UserService from '../services/user.service/user-service'
+import { MyContext } from '../types'
+import { getUserId } from '../utils/get-user-id'
+import {
+    balanceButtons,
+    balanceKeyboard,
+} from '../utils/keyboards/balance-keyboard'
+import { mainKeyboard } from '../utils/keyboards/main-keyboard'
 
 const balanceScene = new Scenes.BaseScene<MyContext>('balanceScene')
 
-balanceScene.enter(async ctx => {
+balanceScene.enter(async (ctx) => {
     const userId = getUserId(ctx)
     const user = await UserService.getUserByPk(userId)
     await ctx.reply(`Ваш баланс: ${user.balance} ₽`, balanceKeyboard)
@@ -20,14 +22,13 @@ balanceScene.hears(balanceButtons[0], (ctx: MyContext) => {
     ctx.scene.leave()
 })
 
-balanceScene.hears(balanceButtons[1], ctx => {
+balanceScene.hears(balanceButtons[1], (ctx) => {
     ctx.sendMessage('Введите сумму пополнения')
 })
 
-balanceScene.on('text', async ctx => {
+balanceScene.on('text', async (ctx) => {
     PaymentController.topUpInternalBalance(ctx)
     ctx.scene.leave()
 })
-
 
 export default balanceScene

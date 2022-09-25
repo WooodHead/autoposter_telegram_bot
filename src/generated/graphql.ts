@@ -1004,7 +1004,7 @@ export type Auto_Poster_Bot_Advertising_Chat_Variance_Fields = {
 export type Auto_Poster_Bot_Payment = {
   __typename?: 'auto_poster_bot_payment';
   amount: Scalars['numeric'];
-  client_id: Scalars['Int'];
+  client_id: Scalars['bigint'];
   date: Scalars['timestamptz'];
   id: Scalars['Int'];
   /** An object relationship */
@@ -1059,7 +1059,7 @@ export type Auto_Poster_Bot_Payment_Bool_Exp = {
   _not?: InputMaybe<Auto_Poster_Bot_Payment_Bool_Exp>;
   _or?: InputMaybe<Array<Auto_Poster_Bot_Payment_Bool_Exp>>;
   amount?: InputMaybe<Numeric_Comparison_Exp>;
-  client_id?: InputMaybe<Int_Comparison_Exp>;
+  client_id?: InputMaybe<Bigint_Comparison_Exp>;
   date?: InputMaybe<Timestamptz_Comparison_Exp>;
   id?: InputMaybe<Int_Comparison_Exp>;
   post?: InputMaybe<Auto_Poster_Bot_Post_Bool_Exp>;
@@ -1080,7 +1080,7 @@ export enum Auto_Poster_Bot_Payment_Constraint {
 /** input type for incrementing numeric columns in table "auto_poster_bot.payment" */
 export type Auto_Poster_Bot_Payment_Inc_Input = {
   amount?: InputMaybe<Scalars['numeric']>;
-  client_id?: InputMaybe<Scalars['Int']>;
+  client_id?: InputMaybe<Scalars['bigint']>;
   id?: InputMaybe<Scalars['Int']>;
   post_id?: InputMaybe<Scalars['Int']>;
   status?: InputMaybe<Scalars['Int']>;
@@ -1089,7 +1089,7 @@ export type Auto_Poster_Bot_Payment_Inc_Input = {
 /** input type for inserting data into table "auto_poster_bot.payment" */
 export type Auto_Poster_Bot_Payment_Insert_Input = {
   amount?: InputMaybe<Scalars['numeric']>;
-  client_id?: InputMaybe<Scalars['Int']>;
+  client_id?: InputMaybe<Scalars['bigint']>;
   date?: InputMaybe<Scalars['timestamptz']>;
   id?: InputMaybe<Scalars['Int']>;
   post?: InputMaybe<Auto_Poster_Bot_Post_Obj_Rel_Insert_Input>;
@@ -1101,7 +1101,7 @@ export type Auto_Poster_Bot_Payment_Insert_Input = {
 export type Auto_Poster_Bot_Payment_Max_Fields = {
   __typename?: 'auto_poster_bot_payment_max_fields';
   amount?: Maybe<Scalars['numeric']>;
-  client_id?: Maybe<Scalars['Int']>;
+  client_id?: Maybe<Scalars['bigint']>;
   date?: Maybe<Scalars['timestamptz']>;
   id?: Maybe<Scalars['Int']>;
   post_id?: Maybe<Scalars['Int']>;
@@ -1112,7 +1112,7 @@ export type Auto_Poster_Bot_Payment_Max_Fields = {
 export type Auto_Poster_Bot_Payment_Min_Fields = {
   __typename?: 'auto_poster_bot_payment_min_fields';
   amount?: Maybe<Scalars['numeric']>;
-  client_id?: Maybe<Scalars['Int']>;
+  client_id?: Maybe<Scalars['bigint']>;
   date?: Maybe<Scalars['timestamptz']>;
   id?: Maybe<Scalars['Int']>;
   post_id?: Maybe<Scalars['Int']>;
@@ -1177,7 +1177,7 @@ export enum Auto_Poster_Bot_Payment_Select_Column {
 /** input type for updating data in table "auto_poster_bot.payment" */
 export type Auto_Poster_Bot_Payment_Set_Input = {
   amount?: InputMaybe<Scalars['numeric']>;
-  client_id?: InputMaybe<Scalars['Int']>;
+  client_id?: InputMaybe<Scalars['bigint']>;
   date?: InputMaybe<Scalars['timestamptz']>;
   id?: InputMaybe<Scalars['Int']>;
   post_id?: InputMaybe<Scalars['Int']>;
@@ -1218,7 +1218,7 @@ export type Auto_Poster_Bot_Payment_Stddev_Samp_Fields = {
 export type Auto_Poster_Bot_Payment_Sum_Fields = {
   __typename?: 'auto_poster_bot_payment_sum_fields';
   amount?: Maybe<Scalars['numeric']>;
-  client_id?: Maybe<Scalars['Int']>;
+  client_id?: Maybe<Scalars['bigint']>;
   id?: Maybe<Scalars['Int']>;
   post_id?: Maybe<Scalars['Int']>;
   status?: Maybe<Scalars['Int']>;
@@ -8123,19 +8123,19 @@ export type GetPaymentByPkQueryVariables = Exact<{
 }>;
 
 
-export type GetPaymentByPkQuery = { __typename?: 'query_root', auto_poster_bot_payment_by_pk?: { __typename?: 'auto_poster_bot_payment', amount: any, date: any, id: number, post_id?: number | null, status: number, client_id: number } | null };
+export type GetPaymentByPkQuery = { __typename?: 'query_root', auto_poster_bot_payment_by_pk?: { __typename?: 'auto_poster_bot_payment', amount: any, date: any, id: number, post_id?: number | null, status: number, client_id: any } | null };
 
 export type GetObservablePaymentsQueryVariables = Exact<{
   _gte: Scalars['timestamptz'];
 }>;
 
 
-export type GetObservablePaymentsQuery = { __typename?: 'query_root', auto_poster_bot_payment: Array<{ __typename?: 'auto_poster_bot_payment', amount: any, client_id: number, date: any, id: number, post_id?: number | null, status: number }> };
+export type GetObservablePaymentsQuery = { __typename?: 'query_root', auto_poster_bot_payment: Array<{ __typename?: 'auto_poster_bot_payment', amount: any, client_id: any, date: any, id: number, post_id?: number | null, status: number }> };
 
 export type InsertNewPaymentMutationVariables = Exact<{
   amount: Scalars['numeric'];
   post_id?: InputMaybe<Scalars['Int']>;
-  client_id: Scalars['Int'];
+  client_id: Scalars['bigint'];
 }>;
 
 
@@ -8164,6 +8164,11 @@ export type GetProductionPostQueryVariables = Exact<{
 
 
 export type GetProductionPostQuery = { __typename?: 'query_root', auto_poster_bot_post: Array<{ __typename?: 'auto_poster_bot_post', advertising_chat_id: any, advertising_days: number, client_id: any, id: number, payment_status: number, keyboard?: string | null, passed_moderation: boolean, photo?: string | null, price: any, publication_end_date?: any | null, publication_start_date?: any | null, text: string, publication_hour: number, chat?: { __typename?: 'auto_poster_bot_advertising_chat', id: any, name: string, per_day_price: number, target_audience: string } | null }> };
+
+export type GetSalesChatListQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetSalesChatListQuery = { __typename?: 'query_root', auto_poster_bot_advertising_chat: Array<{ __typename?: 'auto_poster_bot_advertising_chat', id: any, name: string, per_day_price: number, target_audience: string }> };
 
 export type InserPostMutationVariables = Exact<{
   object: Auto_Poster_Bot_Post_Insert_Input;
@@ -8219,10 +8224,11 @@ export type GetModeratorsQuery = { __typename?: 'query_root', auto_poster_bot_us
 export const PostDataFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"postData"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"auto_poster_bot_post"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"advertising_chat_id"}},{"kind":"Field","name":{"kind":"Name","value":"advertising_days"}},{"kind":"Field","name":{"kind":"Name","value":"client_id"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"payment_status"}},{"kind":"Field","name":{"kind":"Name","value":"keyboard"}},{"kind":"Field","name":{"kind":"Name","value":"passed_moderation"}},{"kind":"Field","name":{"kind":"Name","value":"photo"}},{"kind":"Field","name":{"kind":"Name","value":"price"}},{"kind":"Field","name":{"kind":"Name","value":"publication_end_date"}},{"kind":"Field","name":{"kind":"Name","value":"publication_start_date"}},{"kind":"Field","name":{"kind":"Name","value":"text"}},{"kind":"Field","name":{"kind":"Name","value":"publication_hour"}},{"kind":"Field","name":{"kind":"Name","value":"chat"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"per_day_price"}},{"kind":"Field","name":{"kind":"Name","value":"target_audience"}}]}}]}}]} as unknown as DocumentNode<PostDataFragment, unknown>;
 export const GetPaymentByPkDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPaymentByPK"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"auto_poster_bot_payment_by_pk"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"post_id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"client_id"}}]}}]}}]} as unknown as DocumentNode<GetPaymentByPkQuery, GetPaymentByPkQueryVariables>;
 export const GetObservablePaymentsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetObservablePayments"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"_gte"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"timestamptz"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"auto_poster_bot_payment"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"date"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"_gte"},"value":{"kind":"Variable","name":{"kind":"Name","value":"_gte"}}}]}},{"kind":"ObjectField","name":{"kind":"Name","value":"status"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"_eq"},"value":{"kind":"IntValue","value":"0"}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"client_id"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"post_id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]}}]} as unknown as DocumentNode<GetObservablePaymentsQuery, GetObservablePaymentsQueryVariables>;
-export const InsertNewPaymentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"InsertNewPayment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"amount"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"numeric"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"post_id"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"client_id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"insert_auto_poster_bot_payment_one"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"object"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"status"},"value":{"kind":"IntValue","value":"0"}},{"kind":"ObjectField","name":{"kind":"Name","value":"post_id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"post_id"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"amount"},"value":{"kind":"Variable","name":{"kind":"Name","value":"amount"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"client_id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"client_id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"post_id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]}}]} as unknown as DocumentNode<InsertNewPaymentMutation, InsertNewPaymentMutationVariables>;
+export const InsertNewPaymentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"InsertNewPayment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"amount"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"numeric"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"post_id"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"client_id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"bigint"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"insert_auto_poster_bot_payment_one"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"object"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"status"},"value":{"kind":"IntValue","value":"0"}},{"kind":"ObjectField","name":{"kind":"Name","value":"post_id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"post_id"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"amount"},"value":{"kind":"Variable","name":{"kind":"Name","value":"amount"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"client_id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"client_id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"post_id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]}}]} as unknown as DocumentNode<InsertNewPaymentMutation, InsertNewPaymentMutationVariables>;
 export const UpdateStatusDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateStatus"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"status"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"update_auto_poster_bot_payment_by_pk"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"pk_columns"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}},{"kind":"Argument","name":{"kind":"Name","value":"_set"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"status"},"value":{"kind":"Variable","name":{"kind":"Name","value":"status"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<UpdateStatusMutation, UpdateStatusMutationVariables>;
 export const GetPostByPkDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPostByPk"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"auto_poster_bot_post_by_pk"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"postData"}}]}}]}},...PostDataFragmentDoc.definitions]} as unknown as DocumentNode<GetPostByPkQuery, GetPostByPkQueryVariables>;
 export const GetProductionPostDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetProductionPost"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"_gte"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"timestamptz"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"auto_poster_bot_post"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"payment"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"status"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"_eq"},"value":{"kind":"IntValue","value":"1"}}]}}]}},{"kind":"ObjectField","name":{"kind":"Name","value":"publication_end_date"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"_gte"},"value":{"kind":"Variable","name":{"kind":"Name","value":"_gte"}}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"postData"}}]}}]}},...PostDataFragmentDoc.definitions]} as unknown as DocumentNode<GetProductionPostQuery, GetProductionPostQueryVariables>;
+export const GetSalesChatListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetSalesChatList"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"auto_poster_bot_advertising_chat"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"per_day_price"}},{"kind":"Field","name":{"kind":"Name","value":"target_audience"}}]}}]}}]} as unknown as DocumentNode<GetSalesChatListQuery, GetSalesChatListQueryVariables>;
 export const InserPostDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"InserPost"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"object"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"auto_poster_bot_post_insert_input"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"insert_auto_poster_bot_post_one"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"object"},"value":{"kind":"Variable","name":{"kind":"Name","value":"object"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<InserPostMutation, InserPostMutationVariables>;
 export const TakePostIntoProductionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"takePostIntoProduction"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"publication_start_date"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"timestamptz"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"publication_end_date"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"timestamptz"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"update_auto_poster_bot_post_by_pk"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"pk_columns"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}},{"kind":"Argument","name":{"kind":"Name","value":"_set"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"publication_start_date"},"value":{"kind":"Variable","name":{"kind":"Name","value":"publication_start_date"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"publication_end_date"},"value":{"kind":"Variable","name":{"kind":"Name","value":"publication_end_date"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"passed_moderation"},"value":{"kind":"BooleanValue","value":true}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<TakePostIntoProductionMutation, TakePostIntoProductionMutationVariables>;
 export const AddPaymentIdDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"addPaymentId"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"payment_id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"update_auto_poster_bot_post_by_pk"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"pk_columns"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}},{"kind":"Argument","name":{"kind":"Name","value":"_set"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"payment_id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"payment_id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"payment_id"}}]}}]}}]} as unknown as DocumentNode<AddPaymentIdMutation, AddPaymentIdMutationVariables>;

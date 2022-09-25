@@ -1,6 +1,6 @@
-import { Markup } from "telegraf"
+import { Markup } from 'telegraf'
 
-export const mainButtons = ["🔍 Заказать услуги рекламы", "Баланс", "Поддержка"]
+export const mainButtons = ['🔍 Заказать услуги рекламы', 'Баланс', 'Поддержка']
 
 export const mainKeyboard = Markup.keyboard([
     [mainButtons[0]],

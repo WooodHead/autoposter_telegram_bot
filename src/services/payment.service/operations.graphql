@@ -20,7 +20,7 @@ query GetObservablePayments($_gte: timestamptz!) {
   }
 }
 
-mutation InsertNewPayment($amount: numeric!, $post_id: Int, $client_id: Int!) {
+mutation InsertNewPayment($amount: numeric!, $post_id: Int, $client_id: bigint!) {
   insert_auto_poster_bot_payment_one(object: {
     status: 0,
     post_id: $post_id,

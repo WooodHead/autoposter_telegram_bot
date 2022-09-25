@@ -129,3 +129,4 @@ dist
 example_db.json
 
 .DS_Store
+session.json

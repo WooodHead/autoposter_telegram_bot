@@ -1,6 +1,6 @@
 import UserService from "../user.service/user-service"
 import Post from '../../post'
-import { MyContext } from '../../types/wizard-context'
+import { MyContext } from '../../types'
 import schedule from 'node-schedule'
 import PaymentService from './payment.service'
 import { getCtxText } from '../../utils/helpers'

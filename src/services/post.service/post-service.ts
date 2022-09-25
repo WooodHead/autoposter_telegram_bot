@@ -9,6 +9,7 @@ import {
     Auto_Poster_Bot_Post_Insert_Input,
     GetPostByPkDocument,
     GetProductionPostDocument,
+    GetSalesChatListDocument,
     InserPostDocument,
     TakePostIntoProductionDocument
 } from '../../generated/graphql'
@@ -62,6 +63,10 @@ export default class PostService {
         })
     }
 
+    public static async getSalesChatList () {
+        const chats = await client.request(GetSalesChatListDocument)
+        return chats.auto_poster_bot_advertising_chat
+    }
 
     public static async takePostIntoProduction (post: Post): Promise<number> {
         const data = await client.request(TakePostIntoProductionDocument, {

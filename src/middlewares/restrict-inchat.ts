@@ -1,4 +1,4 @@
-import { MyContext } from '..//types/wizard-context'
+import { MyContext } from '../types'
 
 export const restrictInChat = (ctx: MyContext, next: Function): void => {
     let isPrivateChat: boolean = false

@@ -6,7 +6,7 @@ import {
     IncrementUserBalanceDocument,
     InsertUserDocument
 } from '../../generated/graphql'
-import { AppUser } from '../../types/app-user'
+import { AppUser } from '../../types'
 
 interface RegisterUserPropsType {
     id: number
@@ -23,27 +23,35 @@ type IncrementUserBalanceOptions = {
 
 export default class UserService {
 
-    static async getUserByPk (id: number) {
-        const data = (await client.request(GetUserByPkDocument, { id })).auto_poster_bot_user_by_pk!
+    static async getUserByPk (id: number): Promise<AppUser | null> {
 
-        return { is_bot: false, ...data } as AppUser
+        const data = (await client.request(GetUserByPkDocument, { id })).auto_poster_bot_user_by_pk
+
+        if (!data) {
+            throw Error('user-not-exist')
+        }
+
+        return { ...data, is_bot: false } as AppUser
     }
 
     static async registerUser (object: RegisterUserPropsType) {
         const data = (await client.request(InsertUserDocument, { object: object })).insert_auto_poster_bot_user_one
 
+        if (!data) throw Error('cant-create-new-user')
+
         return {
             is_bot: false,
             ...data
         } as AppUser
+
     }
 
     static async getAdmin () {
         const moders = (await client.request(GetModeratorsDocument)).auto_poster_bot_user
 
-        if (!moders.length) throw Error('No one modderator registered')
-        return { ...moders[0] } as AppUser
+        if (!moders.length) throw Error('moderators-list-empty')
 
+        return { ...moders[0] } as AppUser
     }
 
     static async incrementUserBalance (

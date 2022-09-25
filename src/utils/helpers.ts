@@ -1,9 +1,11 @@
-import { MyContext } from '../types/wizard-context'
+import { MyContext } from '../types'
 
-export function stringifyQueryParams (obj: Record<string, string | number | null | boolean>) {
+export function stringifyQueryParams(
+    obj: Record<string, string | number | null | boolean>,
+) {
     let queryString = '?'
 
-    Object.keys(obj).forEach(key => {
+    Object.keys(obj).forEach((key) => {
         if (!obj[key]) {
             delete obj[key]
         }
@@ -20,10 +22,11 @@ export function stringifyQueryParams (obj: Record<string, string | number | null
 
 export const ctxHaveText = (ctx: MyContext): boolean => {
     if (ctx.message) {
-        return ('text' in ctx.message!) ? true : false
-    }
-    else return false
+        return 'text' in ctx.message ? true : false
+    } else return false
 }
 
-export const getCtxText = (ctx: MyContext): string | null => ('text' in ctx.message!) ? ctx.message.text : null
-export const getCtxPhoto = (ctx: MyContext): unknown | null => ('photo' in ctx.message!) ? ctx.message.photo : null
+export const getCtxText = (ctx: MyContext): string | null =>
+    'text' in ctx.message! ? ctx.message.text : null
+export const getCtxPhoto = (ctx: MyContext): unknown | null =>
+    'photo' in ctx.message! ? ctx.message.photo : null
