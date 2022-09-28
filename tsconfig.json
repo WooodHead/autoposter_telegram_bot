@@ -1,23 +1,17 @@
 {
-  "compilerOptions": {
-    "experimentalDecorators": true,
-    "module": "CommonJS",
-    "esModuleInterop": true,
-    "target": "es2020",
-    "moduleResolution": "node",
-    "sourceMap": true,
-    "outDir": "dist",
-    "strict": false,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "lib": [
-      "es2020"
-    ],
-  },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+    "compilerOptions": {
+        "experimentalDecorators": true,
+        "module": "CommonJS",
+        "esModuleInterop": true,
+        "target": "ES2015",
+        "moduleResolution": "node",
+        "sourceMap": true,
+        "outDir": "dist",
+        "strict": false,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "lib": ["es2020"]
+    },
+    "include": ["src"],
+    "exclude": ["node_modules"]
 }

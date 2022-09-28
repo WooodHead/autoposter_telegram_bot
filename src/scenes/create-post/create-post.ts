@@ -1,18 +1,18 @@
-import { Composer, Markup, Scenes } from "telegraf"
-import Chat from "../../chat"
-import Post from "../../post"
+import { Markup } from 'telegraf'
+import Post from '../../post'
 import PaymentController from '../../services/payment.service/payment.controller'
 import PostService from '../../services/post.service/post-service'
-import { MyContext } from "../../types"
-import { getUser } from '../../utils/get-user-id'
-import { ctxHaveText, getCtxPhoto, getCtxText } from '../../utils/helpers'
-import { backKeyboard, backKeyboardButton } from "../../utils/keyboards/back-keyboard"
-import { mainKeyboard } from "../../utils/keyboards/main-keyboard"
-import { selectChatKeyboard } from "../../utils/keyboards/select-chat-keyboard"
-import { isValidHttpUrl } from "./helpers"
-import { payKeyboard, payKeyboardButtons } from "./keyboars"
+import { MyContext } from '../../types'
+import { getCtxPhoto, getCtxText } from '../../utils/helpers'
+import { getUser } from '../../utils/telegraf/get-user-id'
 
+import QuestionReplyScene, {
+    IQuestionReplySceneConstructor,
+} from '../../utils/telegraf/question-reply-scene'
+import { isValidHttpUrl } from './helpers'
+import { payKeyboard, payKeyboardButtons } from './keyboars'
 
+const p_controller = new PaymentController()
 const priseListMessage = `
 Система скидок действующая в чатах-партнерах:
 
@@ -25,18 +25,16 @@ const priseListMessage = `
 `
 
 const generateFinallMessage = (post: Post) => {
-    return (
-        `
+    return `
 Чат: ${post.chat.name}
 Аудитория: ${post.chat.target_audience}
 Стоимость размещения: ${post.price} ₽
 Срок размещения: ${post.advertising_days} дня
 `
-    )
 }
 
 type PublicationTimes = {
-    name: string,
+    name: string
     data: '12' | '14' | '16'
 }[]
 
@@ -47,202 +45,228 @@ const publicationTimes: PublicationTimes = [
     },
     {
         data: '14',
-        name: '14:00'
+        name: '14:00',
     },
     {
         data: '16',
-        name: '16:00'
-    }
+        name: '16:00',
+    },
 ]
 
-const selectChatStep = new Composer<MyContext>()
+const skipButton = 'Пропустить'
+const skipKeyboard = Markup.keyboard([skipButton]).oneTime().resize()
 
-const choosePublicationTimeStage = new Composer<MyContext>()
+const scenes: IQuestionReplySceneConstructor = [
+    {
+        scene_id: 'enter',
+        async enter(ctx) {
+            const sales_chat_list = await PostService.getSalesChatList()
 
-const payStep = new Composer<MyContext>()
-// const inputEmailStep = new Composer<MyContext>()
+            const buttons = sales_chat_list.map((each) => {
+                return [Markup.button.callback(each.name, each.name)]
+            })
 
-function registerPublicationTimeActions (): void {
-    publicationTimes.forEach(each => {
-
-        choosePublicationTimeStage.action(each.data, async (ctx: MyContext) => {
-            const publicationHour = parseInt(ctx.callbackQuery?.data!)
-
-            if (!publicationHour) return
-
-            const data = ctx.scene.session
-
-            const post = await new Post(
-                data.post_text,
-                data.post_photo,
-                data.post_keyboard,
-                data.advertising_days,
-                publicationHour,
-                getUser(ctx).id,
-                data.chat
-            ).insert()
-
-            const msg = generateFinallMessage(post)
-
-            await ctx.reply("Ваш пост собран! Сейчас скину вам на проверку... ヽ( °◇°)ノ")
-            await post.sendPostInChat(ctx.session.user.chat_id)
-
-            ctx.scene.session.registered_post = post
-
-            await ctx.reply(msg, payKeyboard)
-
-            ctx.wizard.next()
-        })
-        choosePublicationTimeStage.on('text', ctx => {
-            ctx.wizard.back()
-        })
-    })
-}
-
-
-function registerChatActions (chatList: Chat[]): void {
-    chatList.map(chat => {
-        selectChatStep.action(chat.name, async (ctx: MyContext) => {
-            ctx.scene.session.chat = chat
-
-            let message = `Пост будет опубликован в канале (чате) <b>${chat.name}</b>`
-            message += `\nАудитория <b>${chat.target_audience}</b>`
-            message += `\nЦена размещения <b>${chat.per_day_price}</b>₽ за сутки без учата скидки`
-            message += `\n\nCколько дней хотите рекламироваться в чате?`
-            await ctx.replyWithHTML(message, backKeyboard)
-
-            return ctx.wizard.next()
-        })
-    })
-}
-
-
-payStep.hears(payKeyboardButtons[0], async ctx => {
-    const post = ctx.scene.session.registered_post
-    await PaymentController.payWithFk(ctx, post)
-    ctx.scene.leave()
-})
-
-payStep.hears(payKeyboardButtons[1], async ctx => {
-    const post = ctx.scene.session.registered_post
-    await PaymentController.payWithInternalBalance(ctx, post)
-    ctx.scene.leave()
-})
-
-payStep.hears(payKeyboardButtons[2], async ctx => {
-    ctx.reply('Меню', mainKeyboard)
-    ctx.scene.leave()
-})
-
-
-
-
-export const createPostWizard = new Scenes.WizardScene('createPostWizard',
-    ...[
-        async (ctx: MyContext) => {
-            const chats = await PostService.getSalesChatList()
-            ctx.reply(priseListMessage, selectChatKeyboard(chats))
-
-            registerChatActions(chats)
-            return ctx.wizard.next()
+            ctx.reply(priseListMessage, Markup.inlineKeyboard([...buttons]))
         },
 
-        selectChatStep,
+        async actions(scene, next) {
+            const sales_chat_list = await PostService.getSalesChatList()
 
-        async (ctx: MyContext) => {
-            if (!ctxHaveText(ctx)) return
-            const ctxText = getCtxText(ctx)
+            for (const chat of sales_chat_list) {
+                scene.action(chat.name, async (ctx: MyContext) => {
+                    ctx.session.post = {}
 
-            if (ctxText === backKeyboardButton) {
-                ctx.reply("Menu", mainKeyboard)
-                return ctx.scene.leave()
+                    ctx.session.post.chat = chat
+
+                    let message = `Пост будет опубликован в канале (чате) <b>${chat.name}</b>`
+                    message += `\nАудитория <b>${chat.target_audience}</b>`
+                    message += `\nЦена размещения <b>${chat.per_day_price}</b>₽ за сутки без учата скидки`
+                    // message += `\n\nCколько дней хотите рекламироваться в чате?`
+                    await ctx.replyWithHTML(message)
+
+                    next(ctx)
+                })
             }
 
-            const advertisingDays = parseInt(ctxText || '')
-
-            if (!advertisingDays) {
-                return ctx.reply("Не так, мне нужно число дней.")
-            }
-
-
-            ctx.scene.session.advertising_days = advertisingDays
-
-            ctx.reply('Теперь отправльте боту текст поста!', Markup.removeKeyboard())
-            return ctx.wizard.next()
+            scene.on('text', (ctx) => {
+                ctx.reply('Выберете чат!')
+            })
         },
+    },
 
-        async (ctx: MyContext) => {
-            const ctxText = getCtxText(ctx)
-
-            if (!ctxText || ctxText == '') {
-                return ctx.reply('Напишите текст поста!')
-            }
-
-            ctx.scene.session.post_text = ctxText
-
-            ctx.reply("🖼 Пришлите картинку к посту (по желанию).", Markup.keyboard(["Пропустить"]).oneTime().resize())
-            return ctx.wizard.next()
+    {
+        scene_id: 'input-days',
+        enter(ctx) {
+            ctx.reply('Cколько дней хотите рекламироваться в чате?')
         },
-        async (ctx: MyContext) => {
-            const ctxText = getCtxText(ctx)
-            const photo = getCtxPhoto(ctx)
-
-            if (photo) {
-                ctx.scene.session.post_photo = JSON.stringify(photo)
-            }
-            if (ctxText && ctxText !== 'Пропустить') {
-                return ctx.reply('Это не картинка!')
-            }
-
-            let message = "Чтобы добавить URL-кнопку отправьте сообщение в таком формате: 'ТекстКнопки | URL'."
-            await ctx.reply(message, Markup.keyboard(["Пропустить"]).oneTime().resize())
-
-            ctx.wizard.next()
+        actions(scene, next) {
+            scene.on('text', (ctx) => {
+                const advertisingDays = parseInt(getCtxText(ctx))
+                if (advertisingDays) {
+                    ctx.session.post.advertising_days = advertisingDays
+                    return next(ctx)
+                } else {
+                    ctx.reply('Не так! Мне нужно число дней')
+                }
+            })
         },
-        async (ctx: MyContext) => {
-            const ctxText = getCtxText(ctx)
+    },
+    {
+        scene_id: 'input-post-text',
+        enter(ctx) {
+            ctx.reply('Теперь отправьте боту текст поста!')
+        },
+        actions(scene, next) {
+            scene.on('text', (ctx) => {
+                const postText = getCtxText(ctx)
+                ctx.session.post.post_text = postText
+                return next(ctx)
+            })
+            scene.on('photo', (ctx) => {
+                ctx.reply('Сначала текст, а потом все остальное!')
+            })
+        },
+    },
 
-            if (!ctxText)
-                return ctx.reply("Я жду URL-кнопку в формате 'ТекстКнопки | URL'!")
+    {
+        scene_id: 'input-post-photo',
+        enter(ctx) {
+            ctx.reply('Прикрепить картинку к посту (по желанию).', skipKeyboard)
+        },
+        actions(scene, next) {
+            scene.on('text', (ctx) => {
+                if (getCtxText(ctx) === skipButton) {
+                    return next(ctx)
+                }
+                ctx.reply('Это не картинка!')
+            })
+            scene.on('photo', (ctx) => {
+                const photo = getCtxPhoto(ctx)
+                ctx.session.post.post_photo = JSON.stringify(photo)
+                return next(ctx)
+            })
+        },
+    },
 
-            if (ctxText !== "Пропустить") {
+    {
+        scene_id: 'input-post-link',
+        enter(ctx) {
+            ctx.reply(
+                "Чтобы добавить URL-кнопку отправьте сообщение в таком формате: 'ТекстКнопки | URL'",
+                skipKeyboard,
+            )
+        },
+        actions(scene, next) {
+            scene.on('text', (ctx) => {
+                const ctxText = getCtxText(ctx)
+
+                if (ctxText === skipButton) {
+                    return next(ctx)
+                }
+
                 const buttonTitle = ctxText.split('|')[0]?.toString().trim()
                 const buttonUrl = ctxText.split('|')[1]?.toString().trim()
 
                 if (!isValidHttpUrl(buttonUrl) || !buttonTitle) {
-                    return ctx.reply('Неправильная ссылка, она должна быть вормате "ТекстКнопки | https://URL" ')
+                    return ctx.reply(
+                        'Неправильная ссылка, она должна быть вормате "ТекстКнопки | https://URL" ',
+                    )
                 }
-
-                ctx.scene.session.post_keyboard = JSON.stringify([[Markup.button.url(buttonTitle, buttonUrl)]])
-            }
-
-            await ctx.reply('!', Markup.removeKeyboard())
-
-            ctx.reply("Выберите время публикации", {
-                reply_markup: {
-                    inline_keyboard: [[
-                        Markup.button.callback('12:00', '12'),
-                        Markup.button.callback('14:00', '14'),
-                        Markup.button.callback('16:00', '16')
-                    ]],
-                    remove_keyboard: true,
-                    one_time_keyboard: true
-                }
+                ctx.session.post.post_keyboard = JSON.stringify([
+                    [Markup.button.url(buttonTitle, buttonUrl)],
+                ])
+                next(ctx)
             })
-
-            registerPublicationTimeActions()
-
-            return ctx.wizard.next()
         },
-        choosePublicationTimeStage,
+    },
 
-        payStep
-    ]
-)
+    {
+        scene_id: 'input-post-publication-time',
+        enter(ctx) {
+            ctx.reply('Выберите время публикации', {
+                reply_markup: {
+                    inline_keyboard: [
+                        [
+                            Markup.button.callback('12:00', '12'),
+                            Markup.button.callback('14:00', '14'),
+                            Markup.button.callback('16:00', '16'),
+                        ],
+                    ],
+                    remove_keyboard: true,
+                    one_time_keyboard: true,
+                },
+            })
+        },
+        actions(scene, next) {
+            publicationTimes.forEach((each) => {
+                scene.action(each.data, async (ctx: MyContext) => {
+                    const publicationHour = parseInt(ctx.callbackQuery?.data)
+                    // console.log(ctx.session.post)
+                    if (!publicationHour)
+                        throw Error('unknown-post-publication-hour')
 
+                    const {
+                        post_text,
+                        post_photo,
+                        post_keyboard,
+                        advertising_days,
+                        chat,
+                    } = ctx.session.post
 
-createPostWizard.command('start', ctx => {
-    ctx.scene.leave()
-    ctx.reply('🏠', mainKeyboard)
-})
+                    const registered_post = await new Post(
+                        post_text,
+                        post_photo,
+                        post_keyboard,
+                        advertising_days,
+                        publicationHour,
+                        getUser(ctx).id,
+                        chat,
+                    ).insert()
 
+                    const msg = generateFinallMessage(registered_post)
+
+                    await ctx.reply('Так будет выглядеть ваш пост!')
+                    await registered_post.sendPostInChat(
+                        ctx.session.user.chat_id,
+                    )
+
+                    ctx.session.post.registered_post = registered_post
+                    // console.log(registered_post)
+                    await ctx.reply(msg, payKeyboard)
+                    next(ctx)
+                })
+
+                scene.on('text', (ctx) => {
+                    ctx.reply('Выберете время публикации!')
+                })
+            })
+        },
+    },
+
+    {
+        scene_id: 'post-payment',
+        enter(ctx) {
+            ctx.reply('Выберете способ оплаты', payKeyboard)
+        },
+        async actions(scene, next) {
+            scene.on('text', async (ctx) => {
+                const ctxText = getCtxText(ctx)
+
+                const { registered_post } = ctx.session.post
+
+                if (ctxText === payKeyboardButtons[0])
+                    await p_controller.payWithFk(ctx, registered_post)
+                else if (ctxText === payKeyboardButtons[1])
+                    await p_controller.payWithInternalBalance(
+                        ctx,
+                        registered_post,
+                    )
+                else ctx.scene.enter('homeScene')
+                return next(ctx)
+            })
+        },
+    },
+]
+
+export const createPostScenes = new QuestionReplyScene('create-post.', scenes)
+    .scenes

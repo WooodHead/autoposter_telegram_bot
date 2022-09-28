@@ -16,7 +16,7 @@ selectService.enter(async (ctx) => {
 })
 
 selectService.hears(serviceTypeButtons[0], async (ctx) => {
-    ctx.scene.enter('createPostWizard')
+    ctx.scene.enter('create-post.enter')
 })
 
 selectService.hears(serviceTypeButtons[1], (ctx: MyContext) => {

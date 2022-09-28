@@ -1,10 +1,10 @@
-import PostService from '../services/post.service/post-service'
-import Post from '../post'
 import schedule from 'node-schedule'
 import { EVERY_TEN_SEC_CRON_EPX as EVERY_TEN_SEC_CRON_EXP } from '..'
+import Post from '../post'
+import PostService from '../services/post.service/post-service'
 
 export default class PostPublishing {
-    productionPostList: Array<Post> = []
+    private productionPostList: Array<Post> = []
 
     constructor() {
         this.init()
@@ -14,40 +14,52 @@ export default class PostPublishing {
         })
     }
 
+    private add(posts: Post[]) {
+        this.productionPostList.push(...posts)
+    }
+
+    private remove(post: Post) {
+        this.productionPostList = this.productionPostList.filter(
+            (each) => each.id !== post.id,
+        )
+    }
+
+    private isAlreadyObserveble(post: Post): boolean {
+        const id = post.id
+
+        if (this.productionPostList.find((each) => each.id === id)) return true
+        else return false
+    }
+
     private async init() {
         const data: Post[] = await PostService.getProductionPostList()
+        this.add(data)
 
         data.map((each) => {
-            this.registerEliminationEvent(each)
+            this.registerTerminationEvent(each)
             each.registerPublicationEvents()
         })
-
-        this.productionPostList = data
-
-        console.log(
-            'posts now in production:',
-            this.productionPostList.map((each) => [
-                each.id,
-                each.publication_hour,
-            ]),
-        )
     }
 
     private async scheduledPostListUpdate(): Promise<void> {
         const new_data: Post[] = await PostService.getProductionPostList()
 
         // posts that new but by far is not in publishing process
-        const newly_posts = new_data.filter((each) => !this.includes(each))
-        console.log(
-            'newly_posts:',
-            newly_posts.map((each) => each.id),
+        const newly_posts = new_data.filter(
+            (each) => !this.isAlreadyObserveble(each),
         )
-        this.productionPostList.push(...newly_posts)
+        this.add(newly_posts)
 
         console.log(
-            'IN PRODUCTION',
+            'NOW ADDED POSTS:',
+            newly_posts.map((each) => each.id),
+        )
+
+        console.log(
+            'POST PRODUCTION',
             this.productionPostList.map((each) => each.id),
         )
+
         newly_posts.map((each) => {
             each.registerPublicationEvents()
         })
@@ -58,22 +70,12 @@ export default class PostPublishing {
      * registen an Schedule-driven trigger to remove post from production stage.
      * the post will no longer be published in chat.
      */
-    private registerEliminationEvent(post: Post): void {
+    private registerTerminationEvent(post: Post): void {
         // TODO: add ten addition minutes for post will have published in last time.
         const date: Date = post.publication_end_date?.toDate()
-        console.log(`${post.id} elimination ended is sets on ${date}`)
 
         schedule.scheduleJob(date, () => {
-            this.productionPostList = this.productionPostList.filter(
-                (each) => each.id !== post.id,
-            )
+            this.remove(post)
         })
-    }
-
-    private includes(post: Post): boolean {
-        const id = post.id
-
-        if (this.productionPostList.find((each) => each.id === id)) return true
-        else return false
     }
 }

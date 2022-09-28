@@ -1,5 +1,3 @@
-import * as dotenv from 'dotenv'
-dotenv.config()
 // eslint-disable-next-line no-new-func
 const importDynamic = new Function('modulePath', 'return import(modulePath)')
 

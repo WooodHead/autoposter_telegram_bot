@@ -2,7 +2,7 @@ import { Scenes } from 'telegraf'
 import PaymentController from '../services/payment.service/payment.controller'
 import UserService from '../services/user.service/user-service'
 import { MyContext } from '../types'
-import { getUserId } from '../utils/get-user-id'
+import { getUserId } from '../utils/telegraf/get-user-id'
 import {
     balanceButtons,
     balanceKeyboard,
@@ -27,7 +27,7 @@ balanceScene.hears(balanceButtons[1], (ctx) => {
 })
 
 balanceScene.on('text', async (ctx) => {
-    PaymentController.topUpInternalBalance(ctx)
+    new PaymentController().topUpInternalBalance(ctx)
     ctx.scene.leave()
 })
 

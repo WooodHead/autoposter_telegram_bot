@@ -27,6 +27,6 @@ export const ctxHaveText = (ctx: MyContext): boolean => {
 }
 
 export const getCtxText = (ctx: MyContext): string | null =>
-    'text' in ctx.message! ? ctx.message.text : null
+    'text' in ctx.message ? ctx.message.text : null
 export const getCtxPhoto = (ctx: MyContext): unknown | null =>
-    'photo' in ctx.message! ? ctx.message.photo : null
+    'photo' in ctx.message ? ctx.message.photo : null

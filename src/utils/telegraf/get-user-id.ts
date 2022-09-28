@@ -1,5 +1,5 @@
 import { User } from 'telegraf/typings/core/types/typegram'
-import { MyContext } from '../types'
+import { MyContext } from '../../types'
 
 export const getUserId = (ctx: MyContext): number => {
     if (ctx.callbackQuery) {

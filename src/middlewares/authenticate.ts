@@ -1,22 +1,26 @@
 import { MyContext } from '../types'
 
 import { mainKeyboard } from '../utils/keyboards/main-keyboard'
-import { getUser } from '../utils/get-user-id'
+import { getUser } from '../utils/telegraf/get-user-id'
 import UserService from '../services/user.service/user-service'
+import { Middleware } from 'telegraf'
 
 /**
  *  Authentication and registration middleware.
- *  Using third-party package that provoding json sessions to 
+ *  Using third-party package that provoding json sessions to
  *  reduce amount of non-nessesary requsts
- * 
- * @param ctx 
- * @param next 
- * @returns 
+ *
+ * @param ctx
+ * @param next
+ * @returns
  */
-export const authenticate = async (ctx: MyContext, next: Function) => {
+export const authenticate: Middleware<MyContext> = async (
+    ctx: MyContext,
+    next: () => Promise<void>,
+) => {
     try {
-        let user = getUser(ctx)
-        let sessionUser = ctx.session?.user
+        const user = getUser(ctx)
+        const sessionUser = ctx.session?.user
 
         if (!sessionUser) {
             const app_user = await UserService.getUserByPk(user.id)
@@ -30,11 +34,14 @@ export const authenticate = async (ctx: MyContext, next: Function) => {
                     last_name: user.last_name,
                     id: user.id,
                     chat_id: ctx.chat?.id,
-                    username: user.username
-                })!
+                    username: user.username,
+                })
 
                 ctx.session.user = newuser
-                await ctx.reply(`${newuser.first_name}, привет! Теперь и ты с нами 🥳`, mainKeyboard)
+                await ctx.reply(
+                    `${newuser.first_name}, привет! Теперь и ты с нами 🥳`,
+                    mainKeyboard,
+                )
             }
         }
 

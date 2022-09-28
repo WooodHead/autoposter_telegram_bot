@@ -1,5 +1,3 @@
-import * as dotenv from 'dotenv'
-dotenv.config()
 import crypto from 'crypto'
 import fetch from 'node-fetch'
 
@@ -10,7 +8,7 @@ type AcquiringAPIRes<R> = {
 /**
  * Freekassa API gateway
  */
-export default class AcquiringAPI {
+export default class AcquiringClient {
     static async send<T>(
         url: string,
         body_data: Record<string, string | number>,
