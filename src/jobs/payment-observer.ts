@@ -27,35 +27,42 @@ export default class PaymentObserver {
                 this.observable_payments.map((each) => each.id),
             )
 
+            console.log('needObserve', this.observable_payments)
+            console.log('FKPayments', FKPayments)
+
             this.observable_payments.map(async (payment) => {
                 const FKPayment = FKPayments.find(
-                    (each) => each.merchant_order_id == payment.toString(),
+                    (each) => each.merchant_order_id == payment.id.toString(),
                 )
 
                 if (!FKPayment) return
 
-                if (FKPayment.status > 0) {
-                    this.observable_payments = this.observable_payments.filter(
-                        (id) => id.toString() !== FKPayment.merchant_order_id,
-                    )
+                if (FKPayment.status !== 0) {
                     this.paymentService.updatePaymentStatus(
                         payment.id,
                         FKPayment.status,
                     )
 
+                    this.observable_payments = this.observable_payments.filter(
+                        (id) => id.toString() !== FKPayment.merchant_order_id,
+                    )
+
                     console.log(
                         `Payment statsus ${payment} changed. ┌（★ｏ☆）┘`,
                     )
-                } else if (FKPayment.status === 1) {
-                    bot.telegram.sendMessage(
-                        payment.client_id,
-                        'Платеж получен! Спасибо.',
-                    )
-                } else
-                    bot.telegram.sendMessage(
-                        payment.client_id,
-                        'Платеж отклонен.',
-                    )
+
+                    if (FKPayment.status === 1) {
+                        bot.telegram.sendMessage(
+                            payment.client_id,
+                            'Платеж получен! Спасибо.',
+                        )
+                    } else {
+                        bot.telegram.sendMessage(
+                            payment.client_id,
+                            'Платеж отклонен.',
+                        )
+                    }
+                }
             })
         })
     }

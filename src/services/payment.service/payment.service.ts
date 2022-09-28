@@ -31,17 +31,15 @@ export default class PaymentService {
     private ENDPOINT = 'https://pay.freekassa.ru/'
     private FK_SECRET = process.env.FREEKASSA_SECRET_ONE
 
-    // public async getFKTransaction(transaction_id: number) {
-    //     const data = await AcquiringClient.send<GetRegisteredTransactionsRes>(
-    //         '/orders',
-    //         {
-    //             dateFrom: moment()
-    //                 .add('-1', 'days')
-    //                 .format('YYYY-MM-DD HH:mm:ss'),
-    //         },
-    //     )
-    // }
+    // get payments from database that we have to observer, because we can receive a payment
+    public async getObservablePayments() {
+        const data = await client.request(GetObservablePaymentsDocument, {
+            _gte: moment().add('-1', 'days'),
+        })
+        return data.auto_poster_bot_payment
+    }
 
+    // get orders from Freekassa since last 24 hours
     public async getLatestFKPayments(
         required_payment_ids: number[],
     ): Promise<FKTransaction[]> {
@@ -81,13 +79,7 @@ export default class PaymentService {
         return data.insert_auto_poster_bot_payment_one
     }
 
-    public async getObservablePayments() {
-        const data = await client.request(GetObservablePaymentsDocument, {
-            _gte: moment().add('-1', 'days'),
-        })
-        return data.auto_poster_bot_payment
-    }
-
+    // update payment status in db
     public async updatePaymentStatus(
         id: number,
         status: number,

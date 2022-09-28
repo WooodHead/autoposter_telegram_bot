@@ -1,5 +1,5 @@
 import schedule from 'node-schedule'
-import { EVERY_TEN_SEC_CRON_EPX as EVERY_TEN_SEC_CRON_EXP } from '..'
+import { EVERY_THIRTY_SEC_CRON_EPX } from '..'
 import Post from '../post'
 import PostService from '../services/post.service/post-service'
 
@@ -9,7 +9,7 @@ export default class PostPublishing {
     constructor() {
         this.init()
 
-        schedule.scheduleJob(EVERY_TEN_SEC_CRON_EXP, () => {
+        schedule.scheduleJob(EVERY_THIRTY_SEC_CRON_EPX, () => {
             this.scheduledPostListUpdate()
         })
     }

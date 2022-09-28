@@ -3,23 +3,14 @@ import { MyContext } from '../types'
 import { mainButtons, mainKeyboard } from '../utils/keyboards/main-keyboard'
 
 const homeScene = new Scenes.BaseScene<MyContext>('homeScene')
+    .enter((ctx) => ctx.reply(`🏠`, mainKeyboard))
 
-homeScene.hears(mainButtons[0], (ctx) => ctx.scene.enter('selectServiceScene'))
-homeScene.hears(mainButtons[1], (ctx) => ctx.scene.enter('balanceScene'))
-homeScene.hears(mainButtons[2], async (ctx, next) => {
-    // const username = await ctx.ask('what your name?')
-    // if (username === null) {
-    //     return next()
-    // }
-
-    ctx.reply(
-        `По любому вопросу вы можете написать нашему администратору @ivanchinalex`,
-    )
-    // next()
-})
-
-homeScene.on('text', (ctx) => {
-    ctx.reply(`🏠`, mainKeyboard)
-})
+    .hears(mainButtons[0], (ctx) => ctx.scene.enter('selectServiceScene'))
+    .hears(mainButtons[1], (ctx) => ctx.scene.enter('balanceScene'))
+    .hears(mainButtons[2], async (ctx) => {
+        ctx.reply(
+            `По любому вопросу вы можете написать нашему администратору @ivanchinalex`,
+        )
+    })
 
 export default homeScene

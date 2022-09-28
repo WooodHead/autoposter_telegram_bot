@@ -7,7 +7,7 @@ import { getCtxText } from '../../utils/helpers'
 import { Markup } from 'telegraf'
 
 import PostService from '../post.service/post-service'
-import { EVERY_THIRTY_SEC_CRON_EPX as EVERY_THIRTY_SEC_CRON_EXP } from '../..'
+import { EVERY_TEN_SEC_CRON_EPX } from '../..'
 import { getUserId } from '../../utils/telegraf/get-user-id'
 
 const registrationFailMessage = `
@@ -94,7 +94,7 @@ export default class PaymentController {
 
             // Следующее событие выполнится когда PaymentObserver обработает платеж
             const job = schedule.scheduleJob(
-                EVERY_THIRTY_SEC_CRON_EXP,
+                EVERY_TEN_SEC_CRON_EPX,
                 async () => {
                     const payment = await this.paymentService.getPaymentByPK(
                         registered_payment?.id,
@@ -141,22 +141,19 @@ export default class PaymentController {
         )
 
         // post.registerInPaymentNotificationProcess()
-        const job = schedule.scheduleJob(
-            EVERY_THIRTY_SEC_CRON_EXP,
-            async () => {
-                const payment = await this.paymentService.getPaymentByPK(
-                    registered_payment?.id,
-                )
+        const job = schedule.scheduleJob(EVERY_TEN_SEC_CRON_EPX, async () => {
+            const payment = await this.paymentService.getPaymentByPK(
+                registered_payment?.id,
+            )
 
-                if (payment?.status === 1) {
-                    const user = await UserService.incrementUserBalance(
-                        client_id,
-                        payAmount,
-                    )
-                    ctx.reply(`Платеж подтвержден. Ваш баланс ${user?.balance}`)
-                    job.cancel()
-                }
-            },
-        )
+            if (payment?.status === 1) {
+                const user = await UserService.incrementUserBalance(
+                    client_id,
+                    payAmount,
+                )
+                ctx.reply(`Платеж подтвержден. Ваш баланс ${user?.balance}`)
+                job.cancel()
+            }
+        })
     }
 }

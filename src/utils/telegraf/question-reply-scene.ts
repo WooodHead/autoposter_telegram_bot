@@ -3,10 +3,6 @@ import { Middleware, Scenes } from 'telegraf'
 import { MyContext } from '../../types'
 
 export type IQuestionReplySceneConstructor = {
-    // send_question: {
-    //     question: string
-    //     extra?: ExtraReplyMessage
-    // }
     enter: Middleware<MyContext>
     scene_id: string
 
@@ -17,7 +13,6 @@ export type IQuestionReplySceneConstructor = {
 }[]
 
 export default class QuestionReplyScene {
-    // public ids: string[]
     scenes: Scenes.BaseScene<MyContext>[]
 
     constructor(
@@ -28,11 +23,11 @@ export default class QuestionReplyScene {
             (each: IQuestionReplySceneConstructor[number], index, array) => {
                 const scene_name = scene_namespace + each.scene_id
 
-                // this.ids.push(scene_name)
-
                 const sceneWithQuestion = new Scenes.BaseScene<MyContext>(
                     scene_name,
-                ).enter(each.enter)
+                )
+                    .enter(each.enter)
+                    .start((ctx) => ctx.scene.enter('homeScene'))
 
                 const nextScene = (ctx: MyContext) => {
                     if (array[index + 1]) {
