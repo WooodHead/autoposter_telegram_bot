@@ -9,25 +9,21 @@ export default class PaymentObserver {
      */
     observable_payments: Auto_Poster_Bot_Payment[] = []
 
-    constructor() {
+    constructor(private paymentService = new PaymentService()) {
         this.init()
         this.runTaskScheduler()
     }
 
     private async init() {
-        const needObserve = await PaymentService.getObservablePayments()
+        const needObserve = await this.paymentService.getObservablePayments()
         this.observable_payments = needObserve
-        console.log(
-            'observeble payments:',
-            this.observable_payments.map((each) => each.id),
-        )
     }
 
     private async runTaskScheduler() {
         return schedule.scheduleJob(EVERY_TEN_SEC_CRON_EPX, async () => {
             await this.init()
 
-            const FKPayments = await PaymentService.getLatestFKPayments(
+            const FKPayments = await this.paymentService.getLatestFKPayments(
                 this.observable_payments.map((each) => each.id),
             )
 
@@ -42,7 +38,7 @@ export default class PaymentObserver {
                     this.observable_payments = this.observable_payments.filter(
                         (id) => id.toString() !== FKPayment.merchant_order_id,
                     )
-                    PaymentService.updatePaymentStatus(
+                    this.paymentService.updatePaymentStatus(
                         payment.id,
                         FKPayment.status,
                     )
