@@ -1,6 +1,8 @@
 import { Scenes } from 'telegraf'
 import PaymentController from '../services/payment.service/payment.controller'
-import UserService from '../services/user.service/user-service'
+import UserService, {
+    UserNotRegisteredError,
+} from '../services/user.service/user-service'
 import { MyContext } from '../types'
 import { getUserId } from '../utils/telegraf/get-user-id'
 import {
@@ -14,6 +16,11 @@ const balanceScene = new Scenes.BaseScene<MyContext>('balanceScene')
 balanceScene.enter(async (ctx) => {
     const userId = getUserId(ctx)
     const user = await UserService.getUserByPk(userId)
+
+    if (user instanceof UserNotRegisteredError) {
+        return console.error('user not exist ')
+    }
+
     await ctx.reply(`Ваш баланс: ${user.balance} ₽`, balanceKeyboard)
 })
 

@@ -46,7 +46,8 @@ export default class PaymentController {
     ): Promise<void> {
         try {
             const user = await UserService.getUserByPk(post.client_id)
-            if (!user) throw new Error(`client_id is not founded `)
+            if (user instanceof Error)
+                throw new Error(`client_id is not founded `)
 
             if (user.balance < post.price) {
                 throw Error('User haven`t enought money on the balance')

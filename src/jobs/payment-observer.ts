@@ -1,13 +1,14 @@
 import schedule from 'node-schedule'
 import PaymentService from '../services/payment.service/payment.service'
-import { Auto_Poster_Bot_Payment } from '../generated/graphql'
+
 import { bot, EVERY_TEN_SEC_CRON_EPX } from '..'
+import { Payment } from '../types'
 
 export default class PaymentObserver {
     /**
      observeble there is a payments with status = 0.
      */
-    observable_payments: Auto_Poster_Bot_Payment[] = []
+    observable_payments: Payment[] = []
 
     constructor(private paymentService = new PaymentService()) {
         this.init()
@@ -16,7 +17,17 @@ export default class PaymentObserver {
 
     private async init() {
         const needObserve = await this.paymentService.getObservablePayments()
-        this.observable_payments = needObserve
+        this.add(needObserve)
+    }
+
+    private add(new_payments: Payment[]) {
+        this.observable_payments.push(...new_payments)
+    }
+
+    private remove(payment: Payment) {
+        this.observable_payments = this.observable_payments.filter(
+            (each) => each.id !== payment.id,
+        )
     }
 
     private async runTaskScheduler() {
@@ -27,31 +38,34 @@ export default class PaymentObserver {
                 this.observable_payments.map((each) => each.id),
             )
 
-            console.log('needObserve', this.observable_payments)
-            console.log('FKPayments', FKPayments)
+            console.log(
+                'needObserve',
+                this.observable_payments.map((each) => each.id),
+            )
+            console.log(
+                'FKPayments',
+                FKPayments.map((each) => each.merchant_order_id),
+            )
 
             this.observable_payments.map(async (payment) => {
-                const FKPayment = FKPayments.find(
+                const associatedFKPayment = FKPayments.find(
                     (each) => each.merchant_order_id == payment.id.toString(),
                 )
 
-                if (!FKPayment) return
+                if (!associatedFKPayment) return
 
-                if (FKPayment.status !== 0) {
-                    this.paymentService.updatePaymentStatus(
+                // this means that payment were procesed
+                if (associatedFKPayment.status !== 0) {
+                    await this.paymentService.updatePaymentStatus(
                         payment.id,
-                        FKPayment.status,
+                        associatedFKPayment.status,
                     )
 
-                    this.observable_payments = this.observable_payments.filter(
-                        (id) => id.toString() !== FKPayment.merchant_order_id,
-                    )
+                    this.remove(payment)
 
-                    console.log(
-                        `Payment statsus ${payment} changed. ┌（★ｏ☆）┘`,
-                    )
+                    console.log(`Payment status ${payment} changed. ┌（★ｏ☆）┘`)
 
-                    if (FKPayment.status === 1) {
+                    if (associatedFKPayment.status === 1) {
                         bot.telegram.sendMessage(
                             payment.client_id,
                             'Платеж получен! Спасибо.',

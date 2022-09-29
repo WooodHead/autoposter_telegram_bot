@@ -5,6 +5,8 @@ import { acceptPostKeyboard as moderatorKeyboard } from './utils/keyboards/moder
 
 const adminPostModerationMess = async (post: Post) => {
     const user = await UserService.getUserByPk(post.client_id)
+    if (user instanceof Error) return ''
+
     return `
 Привет, новый пост на модерацию!
 Чат: ${post.chat.name}

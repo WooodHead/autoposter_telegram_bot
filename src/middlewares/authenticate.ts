@@ -2,7 +2,9 @@ import { MyContext } from '../types'
 
 import { mainKeyboard } from '../utils/keyboards/main-keyboard'
 import { getUser } from '../utils/telegraf/get-user-id'
-import UserService from '../services/user.service/user-service'
+import UserService, {
+    UserNotRegisteredError,
+} from '../services/user.service/user-service'
 import { Middleware } from 'telegraf'
 
 /**
@@ -25,10 +27,7 @@ export const authenticate: Middleware<MyContext> = async (
         if (!sessionUser) {
             const app_user = await UserService.getUserByPk(user.id)
 
-            if (app_user) {
-                ctx.session.user = app_user
-            } else {
-                // register new user
+            if (app_user instanceof UserNotRegisteredError) {
                 const newuser = await UserService.registerUser({
                     first_name: user.first_name,
                     last_name: user.last_name,
@@ -42,9 +41,10 @@ export const authenticate: Middleware<MyContext> = async (
                     `${newuser.first_name}, привет! Теперь и ты с нами 🥳`,
                     mainKeyboard,
                 )
+            } else {
+                ctx.session.user = app_user
             }
         }
-
         return next()
     } catch (error) {
         console.log(error)

@@ -20,13 +20,17 @@ type IncrementUserBalanceOptions = {
     withBonus: boolean
 }
 
+export class UserNotRegisteredError extends Error {}
+
 export default class UserService {
-    static async getUserByPk(id: number): Promise<AppUser | null> {
+    static async getUserByPk(
+        id: number,
+    ): Promise<AppUser | UserNotRegisteredError> {
         const data = (await client.request(GetUserByPkDocument, { id }))
             .auto_poster_bot_user_by_pk
 
         if (!data) {
-            throw Error('user-not-exist')
+            return new UserNotRegisteredError()
         }
 
         return { ...data, is_bot: false } as AppUser

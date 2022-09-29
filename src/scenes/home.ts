@@ -12,5 +12,6 @@ const homeScene = new Scenes.BaseScene<MyContext>('homeScene')
             `По любому вопросу вы можете написать нашему администратору @ivanchinalex`,
         )
     })
+    .on('text', (ctx) => ctx.reply(`🏠`, mainKeyboard))
 
 export default homeScene
